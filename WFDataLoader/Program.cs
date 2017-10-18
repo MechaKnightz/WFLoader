@@ -33,6 +33,8 @@ namespace WFDataLoader
 
             var time = DateTime.Now;
 
+            List<ItemOffers> allOffers = new List<ItemOffers>();
+
             foreach (var item in allItems)
             {
                 var url = "http://warframe.market/api/get_orders/firstPart/secondPart";
@@ -50,6 +52,7 @@ namespace WFDataLoader
                     contents = wc.DownloadString(url);
 
                 var itemOffers = ItemOffers.FromJson(contents);
+                allOffers.Add(itemOffers);
                 if (itemOffers.Response.Sell.Count > record)
                 {
                     record = itemOffers.Response.Sell.Count;
