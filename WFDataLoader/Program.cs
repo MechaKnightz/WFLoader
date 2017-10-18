@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using WFDataLoader.AllItem;
 using WFDataLoader.ItemOffer;
 
@@ -12,9 +10,18 @@ namespace WFDataLoader
     internal static class Program
     {
         private static Timer _infoTimer;
+        private static string mongoUsername = "";
+        private static string mongoPass = "";
 
         static void Main(string[] args)
         {
+            Console.Write("Enter MongoDB username: ");
+            mongoUsername = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("Enter MongoDB password: ");
+            mongoPass = Console.ReadLine();
+            Console.WriteLine();
+
             _infoTimer = new Timer(GetData, new object(), 0, new TimeSpan(0, 1, 0, 0).Milliseconds);
             while (true)
             {
@@ -26,44 +33,40 @@ namespace WFDataLoader
         static void GetData(object obj)
         {
             var allItems = AllItemDownloader.DownloadItems();
-
-            int record = 0;
-
-            int i = 0;
+            var allItemOffers = new Dictionary<string, ItemOffers>();
 
             var time = DateTime.Now;
-
-            List<ItemOffers> allOffers = new List<ItemOffers>();
-
+            int i = 0;
             foreach (var item in allItems)
             {
-                var url = "http://warframe.market/api/get_orders/firstPart/secondPart";
-
-                var itemType = item.item_type;
-                var itemName = item.item_name;
-
-                if (itemName.Contains(" ")) itemName = itemName.Replace(" ", "%20");
-
-                url = url.Replace("firstPart", itemType);
-                url = url.Replace("secondPart", itemName);
-
-                string contents;
-                using (var wc = new System.Net.WebClient())
-                    contents = wc.DownloadString(url);
-
-                var itemOffers = ItemOffers.FromJson(contents);
-                allOffers.Add(itemOffers);
-                if (itemOffers.Response.Sell.Count > record)
-                {
-                    record = itemOffers.Response.Sell.Count;
-                    Console.WriteLine($"Record is now: {record} with item {item.item_name}");
-                }
+                allItemOffers.Add(item.item_name, DownloadOffers(item));
                 i++;
+                if (i > 15) break;
             }
 
             var latestTime = DateTime.Now - time;
+            Console.WriteLine($"Download took {latestTime.Minutes}:{latestTime.Seconds}");
 
-            Console.WriteLine($"Update took {latestTime.Minutes}:{latestTime.Seconds}");
+            SaveModel.UploadSnapshot(allItemOffers, mongoUsername, mongoPass);
+        }
+
+        private static ItemOffers DownloadOffers(Item item)
+        {
+            var url = "http://warframe.market/api/get_orders/firstPart/secondPart";
+
+            var itemType = item.item_type;
+            var itemName = item.item_name;
+
+            if (itemName.Contains(" ")) itemName = itemName.Replace(" ", "%20");
+
+            url = url.Replace("firstPart", itemType);
+            url = url.Replace("secondPart", itemName);
+
+            string contents;
+            using (var wc = new WebClient())
+                contents = wc.DownloadString(url);
+
+            return ItemOffers.FromJson(contents);
         }
     }
 }
