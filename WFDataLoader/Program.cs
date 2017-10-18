@@ -9,20 +9,17 @@ namespace WFDataLoader
 {
     internal static class Program
     {
-        private static Timer _infoTimer;
-        private static string mongoUsername = "";
-        private static string mongoPass = "";
+        private static string _mongoUsername = "";
+        private static string _mongoPass = "";
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.Write("Enter MongoDB username: ");
-            mongoUsername = Console.ReadLine();
-            Console.WriteLine();
+            _mongoUsername = Console.ReadLine();
             Console.Write("Enter MongoDB password: ");
-            mongoPass = Console.ReadLine();
-            Console.WriteLine();
+            _mongoPass = Console.ReadLine();
 
-            _infoTimer = new Timer(GetData, new object(), 0, new TimeSpan(0, 1, 0, 0).Milliseconds);
+            var unused = new Timer(GetData, new object(), 0, new TimeSpan(0, 1, 0, 0).Milliseconds);
             while (true)
             {
                 var keyEvent = Console.ReadKey();
@@ -33,24 +30,24 @@ namespace WFDataLoader
         static void GetData(object obj)
         {
             var allItems = AllItemDownloader.DownloadItems();
-            var allItemOffers = new Dictionary<string, ItemOffers>();
+            var allItemOffers = new Dictionary<string, Tuple<DateTime, ItemOffers>>();
 
-            var time = DateTime.Now;
             int i = 0;
+            var time = DateTime.Now;
             foreach (var item in allItems)
             {
                 allItemOffers.Add(item.item_name, DownloadOffers(item));
+                if (i > 10) break;
                 i++;
-                if (i > 15) break;
             }
 
             var latestTime = DateTime.Now - time;
             Console.WriteLine($"Download took {latestTime.Minutes}:{latestTime.Seconds}");
 
-            SaveModel.UploadSnapshot(allItemOffers, mongoUsername, mongoPass);
+            SaveModel.UploadSnapshot(allItemOffers, _mongoUsername, _mongoPass);
         }
 
-        private static ItemOffers DownloadOffers(Item item)
+        private static Tuple<DateTime, ItemOffers> DownloadOffers(Item item)
         {
             var url = "http://warframe.market/api/get_orders/firstPart/secondPart";
 
@@ -63,10 +60,19 @@ namespace WFDataLoader
             url = url.Replace("secondPart", itemName);
 
             string contents;
-            using (var wc = new WebClient())
-                contents = wc.DownloadString(url);
+            restart:
+            try
+            {
+                using (var wc = new WebClient())
+                    contents = wc.DownloadString(url);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Error: {e}");
+                goto restart;
+            }
 
-            return ItemOffers.FromJson(contents);
+            return new Tuple<DateTime, ItemOffers>(DateTime.UtcNow, ItemOffers.FromJson(contents));
         }
     }
 }
