@@ -12,7 +12,7 @@ namespace WFDataLoader.ItemOffer
         public static void UploadSnapshot(Dictionary<string, Tuple<DateTime, ItemOffers>> offers, string mongoUsername, string mongoPass)
         {
             restart:
-            //try
+            try
             {
                 var newDict = new Dictionary<string, ItemOffersModel>();
                 foreach (var offer in offers)
@@ -57,13 +57,13 @@ namespace WFDataLoader.ItemOffer
                 }
                 Console.WriteLine("Updated database");
             }
-            //catch (Exception e)
-            //{
-            //    throw new Exception();
-            //    Console.WriteLine($"Error: {e}");
-            //    Thread.Sleep(10000);
-            //    goto restart;
-            //}
+            catch (Exception e)
+            {
+                throw new Exception();
+                Console.WriteLine($"Error: {e}");
+                Thread.Sleep(10000);
+                goto restart;
+            }
         }
     }
     internal class ItemOffersModel
