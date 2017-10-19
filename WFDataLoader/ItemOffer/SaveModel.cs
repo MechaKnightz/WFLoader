@@ -27,6 +27,7 @@ namespace WFDataLoader.ItemOffer
 
                 var collection = database.GetCollection<BsonDocument>("SaveModel");
 
+                var time = DateTime.Now;
                 int i = 0;
                 foreach (var dictItem in newDict)
                 {
@@ -60,6 +61,8 @@ namespace WFDataLoader.ItemOffer
                     Console.WriteLine($"Uploaded item {i}: {item.Name}");
                     i++;
                 }
+                var latestTime = DateTime.Now - time;
+                Console.WriteLine($"Download took {latestTime.Minutes}:{latestTime.Seconds}");
                 Console.WriteLine("All uploading complete.");
             }
             catch (Exception e)
