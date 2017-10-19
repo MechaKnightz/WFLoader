@@ -32,13 +32,10 @@ namespace WFDataLoader
             var allItems = AllItemDownloader.DownloadItems();
             var allItemOffers = new Dictionary<string, Tuple<DateTime, ItemOffers>>();
 
-            int i = 0;
             var time = DateTime.Now;
             foreach (var item in allItems)
             {
                 allItemOffers.Add(item.item_name, DownloadOffers(item));
-                if (i > 10) break;
-                i++;
             }
 
             var latestTime = DateTime.Now - time;
