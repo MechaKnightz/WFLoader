@@ -27,6 +27,7 @@ namespace WFDataLoader.ItemOffer
 
                 var collection = database.GetCollection<BsonDocument>("SaveModel");
 
+                int i = 0;
                 foreach (var dictItem in newDict)
                 {
                     var item = dictItem.Value;
@@ -55,8 +56,11 @@ namespace WFDataLoader.ItemOffer
                     var update = Builders<BsonDocument>.Update.Push("AveragePrice", value);
 
                     collection.FindOneAndUpdateAsync(filter, update);
+
+                    Console.WriteLine($"Uploaded item {i}: {item.Name}");
+                    i++;
                 }
-                Console.WriteLine("Upload complete.");
+                Console.WriteLine("All uploading complete.");
             }
             catch (Exception e)
             {
