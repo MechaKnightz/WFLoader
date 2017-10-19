@@ -59,7 +59,6 @@ namespace WFDataLoader.ItemOffer
             }
             catch (Exception e)
             {
-                throw new Exception();
                 Console.WriteLine($"Error: {e}");
                 Thread.Sleep(10000);
                 goto restart;
