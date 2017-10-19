@@ -63,7 +63,7 @@ namespace WFDataLoader.ItemOffer
                 }
                 var latestTime = DateTime.Now - time;
                 Console.WriteLine($"Download took {latestTime.Minutes}:{latestTime.Seconds}");
-                Console.WriteLine("All uploading complete.");
+                Console.WriteLine("All uploads complete.");
             }
             catch (Exception e)
             {
