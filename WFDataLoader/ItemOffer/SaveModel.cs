@@ -11,6 +11,7 @@ namespace WFDataLoader.ItemOffer
     {
         public static void UploadSnapshot(Dictionary<string, Tuple<DateTime, ItemOffers>> offers, string mongoUsername, string mongoPass)
         {
+            Console.WriteLine("Starting database upload...");
             restart:
             try
             {
@@ -55,7 +56,7 @@ namespace WFDataLoader.ItemOffer
 
                     collection.FindOneAndUpdateAsync(filter, update);
                 }
-                Console.WriteLine("Updated database");
+                Console.WriteLine("Upload complete.");
             }
             catch (Exception e)
             {

@@ -8,11 +8,6 @@ namespace WFDataLoader.AllItem
     {
         private static List<Item> AllItems;
 
-        static AllItemDownloader()
-        {
-            
-        }
-
         public static List<Item> DownloadItems()
         {
             var url = "http://warframe.market/api/get_all_items_v2";
