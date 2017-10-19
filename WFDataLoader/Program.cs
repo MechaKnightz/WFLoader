@@ -19,7 +19,7 @@ namespace WFDataLoader
             Console.Write("Enter MongoDB password: ");
             _mongoPass = Console.ReadLine();
 
-            var unused = new Timer(GetData, new object(), 0, new TimeSpan(0, 1, 0, 0).Milliseconds);
+            var unused = new Timer(GetData, new object(), 0, (int)new TimeSpan(0, 0, 0, 10).TotalMilliseconds);
             while (true)
             {
                 var keyEvent = Console.ReadKey();
@@ -27,7 +27,7 @@ namespace WFDataLoader
             }
         }
 
-        static void GetData(object obj)
+        private static void GetData(object obj)
         {
             var allItems = AllItemDownloader.DownloadItems();
             var allItemOffers = new Dictionary<string, Tuple<DateTime, ItemOffers>>();
