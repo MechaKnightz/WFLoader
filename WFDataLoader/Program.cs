@@ -33,7 +33,7 @@ namespace WFDataLoader
             var allItemOffers = new Dictionary<string, Tuple<DateTime, ItemOffers>>();
 
             var time = DateTime.Now;
-            int i = 0;
+            int i = 1;
             foreach (var item in allItems)
             {
                 allItemOffers.Add(item.item_name, DownloadOffers(item));

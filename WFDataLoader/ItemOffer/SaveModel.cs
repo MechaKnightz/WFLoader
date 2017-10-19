@@ -28,7 +28,7 @@ namespace WFDataLoader.ItemOffer
                 var collection = database.GetCollection<BsonDocument>("SaveModel");
 
                 var time = DateTime.Now;
-                int i = 0;
+                int i = 1;
                 foreach (var dictItem in newDict)
                 {
                     var item = dictItem.Value;
